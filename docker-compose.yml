@@ -1,0 +1,51 @@
+version: '3.8'
+
+services:
+  backend:
+    build: 
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: study_backend
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend:/app
+    environment:
+      - DATABASE_URL=sqlite:///./data/sql_app.db
+      - CHROMA_DB_HOST=chromadb
+      - CHROMA_DB_PORT=8000
+    depends_on:
+      - chromadb
+    networks:
+      - study_network
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: study_frontend
+    ports:
+      - "3000:80"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    networks:
+      - study_network
+    depends_on:
+      - backend
+
+  chromadb:
+    image: chromadb/chroma
+    container_name: study_chromadb
+    ports:
+      - "8001:8000"
+    volumes:
+      - ./data/chroma:/chroma/chroma
+    environment:
+      - IS_PERSISTENT=TRUE
+    networks:
+      - study_network
+
+networks:
+  study_network:
+    driver: bridge
