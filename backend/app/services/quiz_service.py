@@ -16,7 +16,7 @@ class QuizService:
         self.embeddings = GoogleGenAIEmbeddings(model="models/text-embedding-004")
         self.client = chromadb.PersistentClient(path="./chroma_db")
 
-    def _retrieve_document_content(self, topic: str, collection_name: str = "user_docs", k: int = 5) -> str:
+    def _retrieve_document_content(self, topic: str, user_id: int, collection_name: str = "user_docs", k: int = 5) -> str:
         """Retrieve relevant document chunks from ChromaDB based on the topic."""
         try:
             vectordb = Chroma(
@@ -25,8 +25,12 @@ class QuizService:
                 embedding_function=self.embeddings
             )
             
-            # Retrieve relevant chunks
-            docs = vectordb.similarity_search(topic, k=k)
+            # Retrieve relevant chunks with user_id filter
+            docs = vectordb.similarity_search(
+                topic, 
+                k=k,
+                filter={"user_id": user_id}
+            )
             
             if not docs:
                 return ""
@@ -38,11 +42,11 @@ class QuizService:
             print(f"Document retrieval error: {e}")
             return ""
 
-    def generate_quiz(self, topic: str, num_questions: int = 5, document_id: int = None):
+    def generate_quiz(self, topic: str, user_id: int, num_questions: int = 5, document_id: int = None):
         # Retrieve document content if document_id is provided
         document_context = ""
         if document_id:
-            document_context = self._retrieve_document_content(topic)
+            document_context = self._retrieve_document_content(topic, user_id=user_id)
         
         if document_context:
             # Generate quiz from document content

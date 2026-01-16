@@ -20,7 +20,11 @@ def chat(
         # We could use user-specific collection names here provided by the frontend or derived from user ID
         # For now, sticking to "user_docs" as used in ingestion or request.collection_name
         collection = "user_docs" 
-        answer, sources = rag_service.ask_question(request.question, collection_name=collection)
+        answer, sources = rag_service.ask_question(
+            request.question, 
+            user_id=current_user.id,
+            collection_name=collection
+        )
         
         return {
             "answer": answer,

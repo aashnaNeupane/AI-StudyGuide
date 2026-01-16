@@ -30,11 +30,12 @@ def generate_quiz(
                 detail="Document not found or you don't have permission to access it"
             )
     
-    # Generate quiz with optional document context
+    # Generate quiz with optional document context and user isolation
     questions = quiz_service.generate_quiz(
         request.topic, 
-        request.num_questions,
-        request.document_id
+        user_id=current_user.id,
+        num_questions=request.num_questions,
+        document_id=request.document_id
     )
     
     if not questions:

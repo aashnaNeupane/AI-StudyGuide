@@ -15,7 +15,7 @@ class IngestionService:
         self.embeddings = GoogleGenAIEmbeddings(model="models/text-embedding-004")
         self.client = chromadb.PersistentClient(path="./chroma_db")
 
-    def process_document(self, file_path: str, document_id: int, collection_name: str = "documents"):
+    def process_document(self, file_path: str, document_id: int, user_id: int, collection_name: str = "documents"):
         # 1. Load Document
         if file_path.endswith(".pdf"):
             loader = PyPDFLoader(file_path)
@@ -32,9 +32,10 @@ class IngestionService:
         )
         chunks = text_splitter.split_documents(documents)
 
-        # Add document_id to metadata
+        # Add metadata
         for chunk in chunks:
             chunk.metadata["document_id"] = document_id
+            chunk.metadata["user_id"] = user_id
 
         # 3. Store in Chroma
         print(f"DEBUG: Ingesting {len(chunks)} chunks for document {document_id} into collection '{collection_name}'...")

@@ -47,18 +47,16 @@ const FileUpload: React.FC<{ onUploadSuccess?: () => void }> = ({ onUploadSucces
             <div className={`relative group border-2 border-dashed rounded-2xl p-8 flex flex-col items-center justify-center transition-all ${file ? 'border-indigo-300 bg-indigo-50/50' : 'border-slate-200 hover:border-indigo-300 hover:bg-slate-50'
                 }`}>
                 {!file ? (
-                    <>
+                    <label htmlFor="file-upload" className="cursor-pointer flex flex-col items-center">
                         <div className="p-3 bg-white rounded-xl shadow-sm border border-slate-100 mb-4 group-hover:scale-110 transition-transform">
                             <Upload className="h-6 w-6 text-indigo-500" />
                         </div>
                         <div className="text-center">
-                            <label htmlFor="file-upload" className="cursor-pointer">
-                                <span className="text-sm font-bold text-slate-900 group-hover:text-indigo-600">Select Document</span>
-                                <input id="file-upload" name="file-upload" type="file" className="sr-only" onChange={handleFileChange} accept=".pdf,.txt" />
-                            </label>
+                            <span className="text-sm font-bold text-slate-900 group-hover:text-indigo-600">Select Document</span>
+                            <input id="file-upload" name="file-upload" type="file" className="sr-only" onChange={handleFileChange} accept=".pdf,.txt" />
                             <p className="text-xs text-slate-500 mt-1 font-medium">PDF or TXT up to 10MB</p>
                         </div>
-                    </>
+                    </label>
                 ) : (
                     <div className="flex flex-col items-center w-full">
                         <div className="p-3 bg-white rounded-xl shadow-sm border border-slate-100 mb-2">

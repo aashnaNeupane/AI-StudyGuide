@@ -22,7 +22,7 @@ class RAGService:
     def format_docs(self, docs):
         return "\n\n".join(doc.page_content for doc in docs)
 
-    def ask_question(self, query: str, collection_name: str = "documents"):
+    def ask_question(self, query: str, user_id: int, collection_name: str = "documents"):
         # 1. Initialize Vector Store
         vectordb = Chroma(
             client=self.client,
@@ -30,8 +30,13 @@ class RAGService:
             collection_name=collection_name
         )
         
-        # 2. Setup Retriever
-        retriever = vectordb.as_retriever(search_kwargs={"k": 4})
+        # 2. Setup Retriever with user_id filter
+        retriever = vectordb.as_retriever(
+            search_kwargs={
+                "k": 4,
+                "filter": {"user_id": user_id}
+            }
+        )
         
         # 3. Define Prompt
         prompt = ChatPromptTemplate.from_template(

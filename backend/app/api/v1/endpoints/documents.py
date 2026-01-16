@@ -61,7 +61,12 @@ async def upload_document(
 
     # Trigger Ingestion
     try:
-        ingestion_service.process_document(file_location, document_id=db_document.id, collection_name="user_docs") 
+        ingestion_service.process_document(
+            file_location, 
+            document_id=db_document.id, 
+            user_id=current_user.id,
+            collection_name="user_docs"
+        ) 
     except Exception as e:
         print(f"Ingestion failed: {e}")
 
