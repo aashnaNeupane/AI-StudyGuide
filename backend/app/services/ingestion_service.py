@@ -1,21 +1,21 @@
 import os
 from typing import List
 from langchain_community.document_loaders import PyPDFLoader, TextLoader
-from langchain.text_splitter import RecursiveCharacterTextSplitter
-from langchain_openai import OpenAIEmbeddings
+from langchain_text_splitters import RecursiveCharacterTextSplitter
+from app.core.gemini_embeddings import GoogleGenAIEmbeddings
 from langchain_community.vectorstores import Chroma
 from app.core.config import settings
+from dotenv import load_dotenv
+load_dotenv()
 
 import chromadb
-from app.core.config import settings
-
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 class IngestionService:
     def __init__(self):
-        self.embeddings = OpenAIEmbeddings(openai_api_key=settings.OPENAI_API_KEY)
-        # Use HttpClient to connect to the standalone Chroma service
-        self.client = chromadb.HttpClient(host=settings.CHROMA_DB_HOST, port=settings.CHROMA_DB_PORT)
+        self.embeddings = GoogleGenAIEmbeddings(model="models/text-embedding-004")
+        self.client = chromadb.PersistentClient(path="./chroma_db")
 
-    def process_document(self, file_path: str, collection_name: str = "documents"):
+    def process_document(self, file_path: str, document_id: int, collection_name: str = "documents"):
         # 1. Load Document
         if file_path.endswith(".pdf"):
             loader = PyPDFLoader(file_path)
@@ -32,19 +32,49 @@ class IngestionService:
         )
         chunks = text_splitter.split_documents(documents)
 
+        # Add document_id to metadata
+        for chunk in chunks:
+            chunk.metadata["document_id"] = document_id
+
         # 3. Store in Chroma
-        vectordb = Chroma.from_documents(
-            documents=chunks,
-            embedding=self.embeddings,
-            client=self.client,
-            collection_name=collection_name
-        )
-        # vectordb.persist() # Not needed for HttpClient
+        print(f"DEBUG: Ingesting {len(chunks)} chunks for document {document_id} into collection '{collection_name}'...")
+        try:
+            vectordb = Chroma.from_documents(
+                documents=chunks,
+                embedding=self.embeddings,
+                client=self.client,
+                collection_name=collection_name
+            )
+            print("DEBUG: Ingestion triggered via Chroma.from_documents")
+            # Force a little check
+            col = self.client.get_collection(collection_name)
+            print(f"DEBUG: Collection '{collection_name}' count after ingestion: {col.count()}")
+        except Exception as e:
+            print(f"DEBUG: Ingestion error in Chroma: {e}")
+            raise e
         
         return len(chunks)
 
-    def delete_collection(self, collection_name: str):
-        # TODO: Implement deletion logic if needed
-        pass
+    def delete_document_chunks(self, document_id: int, file_path: str = None, collection_name: str = "user_docs"):
+        """Delete all chunks associated with a specific document_id or file_path."""
+        print(f"DEBUG: Deleting chunks for document ID {document_id} (path: {file_path}) from collection '{collection_name}'...")
+        try:
+            col = self.client.get_collection(collection_name)
+            
+            # 1. Delete by document_id metadata (for new uploads)
+            col.delete(where={"document_id": document_id})
+            
+            # 2. Delete by source metadata (fallback for older/all uploads)
+            if file_path:
+                # Standardize path for matching (Chroma often uses forward slashes internally)
+                normalized_path = file_path.replace("\\", "/")
+                col.delete(where={"source": file_path})
+                if normalized_path != file_path:
+                    col.delete(where={"source": normalized_path})
+            
+            print(f"DEBUG: Cleanup successful for {document_id}. Current collection count: {col.count()}")
+        except Exception as e:
+            print(f"DEBUG: Error during Chroma cleanup: {e}")
+            # Non-blocking, but good to log
 
 ingestion_service = IngestionService()

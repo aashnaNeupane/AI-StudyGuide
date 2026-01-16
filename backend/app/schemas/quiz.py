@@ -11,6 +11,7 @@ class Question(BaseModel):
 class QuizGenerateRequest(BaseModel):
     topic: str
     num_questions: int = 5
+    document_id: Optional[int] = None  # Optional: Generate quiz from specific document
 
 class QuizCreate(BaseModel):
     topic: str

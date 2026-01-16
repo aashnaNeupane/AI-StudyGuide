@@ -59,15 +59,54 @@ async def upload_document(
     db.commit()
     db.refresh(db_document)
 
-    # Trigger Ingestion (Async ideally, but blocking for MVP)
+    # Trigger Ingestion
     try:
-        ingestion_service.process_document(file_location, collection_name="user_docs") 
-        # Note: We might want to metadata filter by user_id in retrieval, so storing all in one collection with metadata is better.
-        # But for now, let's keep it simple. `ingestion_service` stores basics. 
-        # Ideally, we add metadata={"user_id": user.id} to chunks.
+        ingestion_service.process_document(file_location, document_id=db_document.id, collection_name="user_docs") 
     except Exception as e:
         print(f"Ingestion failed: {e}")
-        # Optionally delete DB entry or mark as failed
-        # raise HTTPException(status_code=500, detail="Ingestion failed")
 
     return db_document
+
+@router.delete("/{document_id}")
+def delete_document(
+    document_id: int,
+    db: Session = Depends(deps.get_db),
+    current_user: models.User = Depends(deps.get_current_active_user),
+) -> Any:
+    """
+    Delete a document.
+    """
+    # Find document and verify ownership
+    document = db.query(models.Document).filter(
+        models.Document.id == document_id,
+        models.Document.owner_id == current_user.id
+    ).first()
+    
+    if not document:
+        raise HTTPException(
+            status_code=404,
+            detail="Document not found or you don't have permission to delete it"
+        )
+    
+    # 1. Cleanup ChromaDB Vector Data
+    try:
+        ingestion_service.delete_document_chunks(
+            document_id=document_id, 
+            file_path=document.file_path,
+            collection_name="user_docs"
+        )
+    except Exception as e:
+        print(f"Vector cleanup failed: {e}")
+    
+    # 2. Delete file from disk
+    try:
+        if os.path.exists(document.file_path):
+            os.remove(document.file_path)
+    except Exception as e:
+        print(f"Error deleting file from disk: {e}")
+    
+    # 3. Delete from database
+    db.delete(document)
+    db.commit()
+    
+    return {"message": "Document deleted successfully"}

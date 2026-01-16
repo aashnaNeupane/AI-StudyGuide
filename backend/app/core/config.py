@@ -22,6 +22,12 @@ class Settings(BaseSettings):
     # OPENAI
     OPENAI_API_KEY: str = os.getenv("OPENAI_API_KEY", "")
 
+    # GROQ
+    GROQ_API_KEY: str = os.getenv("GROQ_API_KEY", "")
+
+    # GEMINI
+    GEMINI_API_KEY: str = os.getenv("GEMINI_API_KEY", "")
+
     class Config:
         case_sensitive = True
 

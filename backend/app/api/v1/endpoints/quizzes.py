@@ -15,9 +15,27 @@ def generate_quiz(
     current_user: models.User = Depends(deps.get_current_active_user),
 ) -> Any:
     """
-    Generate a quiz based on a topic.
+    Generate a quiz based on a topic and optionally from a specific document.
     """
-    questions = quiz_service.generate_quiz(request.topic, request.num_questions)
+    # Validate document ownership if document_id is provided
+    if request.document_id:
+        document = db.query(models.Document).filter(
+            models.Document.id == request.document_id,
+            models.Document.owner_id == current_user.id
+        ).first()
+        
+        if not document:
+            raise HTTPException(
+                status_code=404, 
+                detail="Document not found or you don't have permission to access it"
+            )
+    
+    # Generate quiz with optional document context
+    questions = quiz_service.generate_quiz(
+        request.topic, 
+        request.num_questions,
+        request.document_id
+    )
     
     if not questions:
         raise HTTPException(status_code=500, detail="Failed to generate quiz")

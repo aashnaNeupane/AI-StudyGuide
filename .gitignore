@@ -1,0 +1,48 @@
+# =========================
+# Python / FastAPI
+# =========================
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pytest_cache/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.venv/
+venv/
+env/
+
+# Environment variables (secrets)
+.env
+.env.*
+
+# =========================
+# FastAPI / Uvicorn
+# =========================
+*.log
+
+# =========================
+# Node / Frontend
+# =========================
+node_modules/
+dist/
+build/
+
+# =========================
+# Docker
+# =========================
+docker-compose.override.yml
+
+# =========================
+# IDEs / OS
+# =========================
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+
+backend/chroma_db/
+backend/data/
+backend/uploads/

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { client } from '../api/client';
-import { Upload, FileText, CheckCircle, AlertCircle } from 'lucide-react';
+import { Upload, FileText, CheckCircle, AlertCircle, X } from 'lucide-react';
 
 const FileUpload: React.FC<{ onUploadSuccess?: () => void }> = ({ onUploadSuccess }) => {
     const [file, setFile] = useState<File | null>(null);
@@ -41,29 +41,62 @@ const FileUpload: React.FC<{ onUploadSuccess?: () => void }> = ({ onUploadSucces
     };
 
     return (
-        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-            <h3 className="text-lg font-medium text-gray-900 mb-4">Upload Study Material</h3>
-            <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 flex flex-col items-center justify-center space-y-4">
-                <Upload className="h-10 w-10 text-gray-400" />
-                <div className="text-center">
-                    <label htmlFor="file-upload" className="cursor-pointer font-medium text-primary hover:text-indigo-500">
-                        <span>Upload a file</span>
-                        <input id="file-upload" name="file-upload" type="file" className="sr-only" onChange={handleFileChange} accept=".pdf,.txt" />
-                    </label>
-                    <p className="text-xs text-gray-500">PDF or TXT up to 10MB</p>
-                </div>
-                {file && <p className="text-sm text-gray-700 flex items-center"><FileText className="h-4 w-4 mr-1" /> {file.name}</p>}
+        <div className="space-y-4">
+            <h3 className="text-xl font-bold text-slate-900">Add Material</h3>
+
+            <div className={`relative group border-2 border-dashed rounded-2xl p-8 flex flex-col items-center justify-center transition-all ${file ? 'border-indigo-300 bg-indigo-50/50' : 'border-slate-200 hover:border-indigo-300 hover:bg-slate-50'
+                }`}>
+                {!file ? (
+                    <>
+                        <div className="p-3 bg-white rounded-xl shadow-sm border border-slate-100 mb-4 group-hover:scale-110 transition-transform">
+                            <Upload className="h-6 w-6 text-indigo-500" />
+                        </div>
+                        <div className="text-center">
+                            <label htmlFor="file-upload" className="cursor-pointer">
+                                <span className="text-sm font-bold text-slate-900 group-hover:text-indigo-600">Select Document</span>
+                                <input id="file-upload" name="file-upload" type="file" className="sr-only" onChange={handleFileChange} accept=".pdf,.txt" />
+                            </label>
+                            <p className="text-xs text-slate-500 mt-1 font-medium">PDF or TXT up to 10MB</p>
+                        </div>
+                    </>
+                ) : (
+                    <div className="flex flex-col items-center w-full">
+                        <div className="p-3 bg-white rounded-xl shadow-sm border border-slate-100 mb-2">
+                            <FileText className="h-6 w-6 text-indigo-600" />
+                        </div>
+                        <span className="text-sm font-bold text-slate-800 text-center truncate max-w-[200px] mb-1">{file.name}</span>
+                        <button
+                            onClick={() => setFile(null)}
+                            className="text-xs font-bold text-red-500 hover:text-red-600 flex items-center"
+                        >
+                            <X className="h-3 w-3 mr-1" /> Remove
+                        </button>
+                    </div>
+                )}
             </div>
 
-            {status === 'success' && <div className="mt-4 p-2 bg-green-50 text-green-700 rounded text-sm flex items-center"><CheckCircle className="h-4 w-4 mr-2" /> {message}</div>}
-            {status === 'error' && <div className="mt-4 p-2 bg-red-50 text-red-700 rounded text-sm flex items-center"><AlertCircle className="h-4 w-4 mr-2" /> {message}</div>}
+            {status === 'success' && (
+                <div className="p-3 bg-emerald-50 text-emerald-700 rounded-xl text-xs font-bold flex items-center animate-in fade-in zoom-in-95">
+                    <CheckCircle className="h-4 w-4 mr-2 shrink-0" /> {message}
+                </div>
+            )}
+            {status === 'error' && (
+                <div className="p-3 bg-red-50 text-red-700 rounded-xl text-xs font-bold flex items-center animate-in fade-in zoom-in-95">
+                    <AlertCircle className="h-4 w-4 mr-2 shrink-0" /> {message}
+                </div>
+            )}
 
             <button
                 onClick={handleUpload}
                 disabled={!file || uploading}
-                className="mt-4 w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary hover:bg-indigo-700 focus:outline-none disabled:bg-gray-300 disabled:cursor-not-allowed"
+                className="w-full flex justify-center items-center py-3 px-4 border border-transparent rounded-2xl shadow-lg shadow-indigo-100 text-sm font-bold text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none disabled:bg-slate-100 disabled:text-slate-400 disabled:shadow-none transition-all active:scale-[0.98]"
             >
-                {uploading ? 'Uploading...' : 'Upload Document'}
+                {uploading ? (
+                    <>
+                        <div className="animate-spin rounded-full h-4 w-4 border-2 border-white/20 border-t-white mr-2" />
+                        Processing...
+                    </>
+                ) : 'Upload Document'}
             </button>
         </div>
     );
