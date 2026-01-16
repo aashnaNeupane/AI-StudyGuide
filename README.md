@@ -1,21 +1,15 @@
 # StudyAI - Intelligent Study Assistant
 
 StudyAI is a premium, AI-powered study assistant designed to help students master their learning materials through intelligent RAG (Retrieval-Augmented Generation) chat and automated quiz generation.
+
 ## 📸 Screenshots
 
-````carousel
-![Login Page](screenshots/LogIn.png)
-<!-- slide -->
-![Sign Up Page](screenshots/SignUp.png)
-<!-- slide -->
-![Dashboard](screenshots/Dashboar.png)
-<!-- slide -->
-![Quiz Generator](screenshots/Quiz_generator.png)
-<!-- slide -->
-![Quiz Questions](screenshots/quiz_questions.png)
-<!-- slide -->
-![Chat Interface](screenshots/Chat.png)
-````
+![Login Page](file:///d:/CIC_Project/screenshots/LogIn.png)
+![Sign Up Page](file:///d:/CIC_Project/screenshots/SignUp.png)
+![Dashboard](file:///d:/CIC_Project/screenshots/Dashboar.png)
+![Quiz Generator](file:///d:/CIC_Project/screenshots/Quiz_generator.png)
+![Quiz Questions](file:///d:/CIC_Project/screenshots/quiz_questions.png)
+![Chat Interface](file:///d:/CIC_Project/screenshots/Chat.png)
 
 
 ## ✨ Features
