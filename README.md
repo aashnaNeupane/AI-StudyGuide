@@ -4,12 +4,15 @@ StudyAI is a premium, AI-powered study assistant designed to help students maste
 
 ## 📸 Screenshots
 
-![Login Page](file:///d:/CIC_Project/screenshots/LogIn.png)
-![Sign Up Page](file:///d:/CIC_Project/screenshots/SignUp.png)
-![Dashboard](file:///d:/CIC_Project/screenshots/Dashboar.png)
-![Quiz Generator](file:///d:/CIC_Project/screenshots/Quiz_generator.png)
-![Quiz Questions](file:///d:/CIC_Project/screenshots/quiz_questions.png)
-![Chat Interface](file:///d:/CIC_Project/screenshots/Chat.png)
+## 📸 Screenshots
+
+![Login Page](screenshots/LogIn.png)
+![Sign Up Page](screenshots/SignUp.png)
+![Dashboard](screenshots/Dashboard.png)
+![Quiz Generator](screenshots/Quiz_generator.png)
+![Quiz Questions](screenshots/quiz_questions.png)
+![Chat Interface](screenshots/Chat.png)
+
 
 
 ## ✨ Features
